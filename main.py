@@ -1,33 +1,47 @@
-import os.path as path
-import os
 import cv2
-from PIL import Image, ExifTags
+import json
+import os.path as path
 import numpy as np
 from utils import get_exposure
-
-# use classes
-
-
-images = ["HdrProject/Dataset/stella/under.jpg", "HdrProject/Dataset/stella/mid.jpg", "HdrProject/Dataset/stella/over.jpg"]
-# put the paths in a json file
-
-exposure_times = np.array([get_exposure(Image.open(img)) for img in images], dtype= np.float32)
-
-images = [cv2.imread(x) for x in images]
-
-merge_debevec = cv2.createMergeDebevec()
-hdr_debevec = merge_debevec.process(images, times= exposure_times.copy())
+from PIL import Image
 
 
 
-tonemap = cv2.createTonemapDrago()
-res_debevec = tonemap.process(hdr_debevec.copy())
 
-res = np.clip(res_debevec* 255, 0, 255).astype('uint8')
 
-cv2.imwrite("res.jpg", res)
 # create folder if it does not exists 
 # save inside it
-
 # Create a setup file?
 
+
+class HdrImplementations():
+
+    def __init__(self, dataset_name: str) -> None:
+        self.settings = json.load(open("settings.json"))
+        self.images = [cv2.imread(im) for im in self.settings["dataset"][dataset_name]]
+        self.exposure_times = np.array([get_exposure(Image.open(im)) for im in self.settings["dataset"][dataset_name]], dtype= np.float32)
+        self.tonemapAlgo = cv2.createTonemapDrago()
+        self.result_hdr = None
+        self.result_img = None
+
+    def applyDebevec(self):
+        merge = cv2.createMergeDebevec()
+        self.result_hdr = merge.process(self.images, times= self.exposure_times.copy())
+        
+    def tonemap(self):
+        self.result_img = np.clip(self.tonemapAlgo.process(self.result_hdr.copy()) * 255, 0, 255).astype('uint8')
+
+
+    def save_image(self):
+        if self.result_img is not None:
+            cv2.imwrite(path.join(self.settings["save_path"], "result_image.jpg"), self.result_img)
+
+
+def main():
+    hdr = HdrImplementations(dataset_name="star")
+    hdr.applyDebevec()
+    hdr.tonemap()
+    hdr.save_image()
+
+if __name__ == "__main__":
+    main()
