@@ -17,6 +17,7 @@ from PIL import Image
 class HdrImplementations():
 
     def __init__(self, dataset_name: str) -> None:
+        self.dataset_name = dataset_name
         self.settings = json.load(open("settings.json"))
         self.images = [cv2.imread(im) for im in self.settings["dataset"][dataset_name]]
         self.exposure_times = np.array([get_exposure(Image.open(im)) for im in self.settings["dataset"][dataset_name]], dtype= np.float32)
@@ -34,7 +35,7 @@ class HdrImplementations():
 
     def save_image(self):
         if self.result_img is not None:
-            cv2.imwrite(path.join(self.settings["save_path"], "result_image.jpg"), self.result_img)
+            cv2.imwrite(path.join(self.settings["save_path"], f"result_{self.dataset_name}.jpg"), self.result_img)
 
 
 def main():
