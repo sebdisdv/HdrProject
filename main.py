@@ -40,9 +40,9 @@ class HdrImplementations():
 
 def main():
     hdr = HdrImplementations(dataset_name="star")
-    hdr.applyDebevec()
-    hdr.tonemap()
-    hdr.save_image()
+    # hdr.applyDebevec()
+    # hdr.tonemap()
+    # hdr.save_image()
 
 if __name__ == "__main__":
     main()
