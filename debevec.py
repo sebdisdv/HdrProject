@@ -43,7 +43,7 @@ def debevec(channel, exposures):
             wij = w(Z[i][j] + 1)
             A[k][Z[i][j] + 1] = wij
             A[k][n+i] = -wij
-            b[k][0] = wij * exposures[j]
+            b[k][0] = wij * log(exposures[j])
             k += 1
     
     # Fix curve by setting its middle value to 0
