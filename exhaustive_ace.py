@@ -1,12 +1,13 @@
-import numpy as np
-import cv2 as cv
 import concurrent.futures
-
-from numba import jit
 from math import ceil
+
+import cv2 as cv
+import numpy as np
+from numba import jit
 from PIL import Image
-from utils import split_channels
 from tqdm import tqdm
+
+from utils import split_channels
 
 
 def imVal(x, y, img):
@@ -44,7 +45,8 @@ def css(img):
     """
     Color Space Scaling
     """
-    res = np.zeros(shape= img.shape, dtype=np.uint8)
+    # res = np.zeros(shape= img.shape, dtype=np.uint8)
+    res = np.zeros(shape= img.shape, dtype=np.float32)
     Max_IM = np.ndarray.max(img)
     Min_IM = np.ndarray.min(img)
     S  = 255/ (Max_IM - Min_IM)
@@ -52,7 +54,8 @@ def css(img):
     D_mid = D_max / 2
     for x in tqdm(range(img.shape[0])):
         for y in range(img.shape[1]):
-            res[x][y] = ceil(D_mid + (S) * img[x][y])
+            # res[x][y] = ceil(D_mid + (S) * img[x][y])
+            res[x][y] = D_mid + (S) * img[x][y]
     return res
 
 @jit
@@ -79,9 +82,10 @@ def distance(px1_x, px1_y, px2_x, px2_y):
 
 def ace(img: Image):
     (b, g, r) = split_channels(img)
-    cv.imshow("rO", r)
-    cv.imshow("gO", g)
-    cv.imshow("bO", b)
+    # cv.imshow("rO", r)
+    # cv.imshow("gO", g)
+    # cv.imshow("bO", b)
+    
 
     with concurrent.futures.ProcessPoolExecutor() as executor:
         proc1 = executor.submit(csa, b)
@@ -104,20 +108,19 @@ def ace(img: Image):
         r_fin = proc3.result()
 
     
-    cv.imshow("r", r_fin)
-    cv.imshow("g", g_fin)
-    cv.imshow("b", b_fin)
+    # cv.imshow("r", r_fin)
+    # cv.imshow("g", g_fin)
+    # cv.imshow("b", b_fin)
+    # cv.waitKey(0)
     return cv.merge((b_fin, g_fin, r_fin))
 
 
 def compute(img_path):
     img = cv.imread(img_path)
     img = cv.resize(img, (100, 100), interpolation= cv.INTER_AREA)
-    cv.imshow("Original image", img)
+    # cv.imshow("Original image", img)   
     img = ace(img)
-    cv.imshow("Hdr image",img)
-    # cv.waitKey(0)
+    # cv.imshow("Hdr image",img)
     return img
     
-
 

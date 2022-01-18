@@ -1,15 +1,13 @@
-import cv2
 import json
 import os.path as path
+
+import cv2
 import numpy as np
-import windowed_ace
-import exhaustive_ace
-from utils import get_exposure
 from PIL import Image
 
-
-
-
+import exhaustive_ace
+import windowed_ace
+from utils import get_exposure
 
 # create folder if it does not exists 
 # save inside it
@@ -36,14 +34,16 @@ class HdrImplementations():
         self.result_img = np.clip(self.tonemapAlgo.process(self.result_merge.copy()) * 255, 0, 255).astype('uint8')
 
     def applyAceWindowed(self, image_index, window):
-        self.result_img = windowed_ace.compute(self.images_paths[image_index], window)
+        self.result_merge = windowed_ace.compute(self.images_paths[image_index], window)
+        self.tonemap()
     
     def applyAceExhaustive(self, image_index):
-        self.result_img = exhaustive_ace.compute(self.images_paths[image_index])
+        self.result_merge = exhaustive_ace.compute(self.images_paths[image_index])
+        self.tonemap()
 
-    def save_image(self):
+    def save_image(self, name):
         if self.result_img is not None:
-            cv2.imwrite(path.join(self.settings["save_path"], f"result_{self.dataset_name}.jpg"), self.result_img)
+            cv2.imwrite(path.join(self.settings["save_path"], name), self.result_img)
 
 
 def main():
