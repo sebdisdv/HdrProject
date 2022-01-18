@@ -1,3 +1,4 @@
+from pprint import pprint
 import cv2 as cv
 from matplotlib.pyplot import axes
 import numpy as np
@@ -16,7 +17,7 @@ def w(z, Z_min= 0, Z_max = 255):
 def compute_Z(channel):
     Z_indexes = get_pixels_indexes((channel.shape[1], channel.shape[2]))
     # 100 is the number of pixel necessary
-    Z = np.zeros(shape= (100, 3), dtype= np.uint8)
+    Z = np.zeros(shape= (500, 3), dtype= np.uint8)
     k = 0
     for (i,j) in Z_indexes:
         Z[k][0] = channel[0][i][j]
@@ -29,12 +30,12 @@ def compute_Z(channel):
 def debevec(channel, exposures):
     Z_min = 0
     Z_max = 255
-    n = 255
-    l = 10 # weight the smoothnees term relative to the data fitting term
+    n = 256
+    l = 5 # weight the smoothnees term relative to the data fitting term
     Z = compute_Z(channel)
-    A = np.zeros(shape= (Z.shape[0] * Z.shape[1] + n + 1, Z.shape[0] + n))
-    b = np.zeros(shape= (A.shape[0], 1))
-
+    A = np.zeros(shape= (Z.shape[0] * Z.shape[1] + n + 1, Z.shape[0] + n), dtype=np.float32)
+    b = np.zeros(shape= (A.shape[0], 1), dtype=np.float32)
+    
     # Datafitting equations
 
     k = 0
@@ -48,7 +49,7 @@ def debevec(channel, exposures):
     
     # Fix curve by setting its middle value to 0
 
-    A[k, 129] = 1
+    A[k, 129] = 0
     k += 1
 
     # include smoothness operation
@@ -60,7 +61,7 @@ def debevec(channel, exposures):
         k += 1
     # x = np.linalg.svd(np.concatenate((A , b), axis=1))[1]
     x = np.linalg.lstsq(A, b, rcond=None)[0]
-    g = x[0: n]
+    g = x[0: n - 1]
     lnE = x[n: len(x) + 1]
     
     print(len(g))
@@ -95,6 +96,7 @@ def compute(imgs, exposures):
     c, d = debevec(b, exposures)
     
     plt.plot(c, range(255))
+    pprint(c)
     plt.savefig("PLOT.png")
     # return cv.merge((b, g, r))
 

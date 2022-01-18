@@ -2,7 +2,7 @@
   "save_path": "Results",
   "dataset": {
     "star": [
-      "Dataset/stella/mid.jpg",
+      "Dataset/stella/under.jpg",
       "Dataset/stella/mid.jpg",
       "Dataset/stella/over.jpg"
     ]
