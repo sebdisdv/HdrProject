@@ -3,7 +3,7 @@ import numpy as np
 from PIL.ExifTags import TAGS
 from PIL.Image import Image
 from random import sample
-
+import pprint
 
 def get_exposure (img:Image) -> float:
    """
@@ -40,4 +40,13 @@ def get_pixels_indexes(img_shape):
          Z_indexes[k][1] = j
          k += 1
    return Z_indexes
+
+
+# onlywork if width and height can be divided by window
+def get_region_indexes(witdh, height, window):
+   indexes = []
+   for i in range(0, witdh, window):
+      for j in range(0, height, window):
+         indexes.append(((i, i+window), (j, j + window)))
+   return indexes
 
