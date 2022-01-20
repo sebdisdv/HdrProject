@@ -37,7 +37,7 @@ def compute_Z(channel):
 
 def debevec(channel, exposures):
     n = 256
-    l = 15 # weight the smoothnees term relative to the data fitting term
+    l = 50 # weight the smoothnees term relative to the data fitting term
     Z = compute_Z(channel)
     A = np.zeros(shape= (Z.shape[0] * Z.shape[1] + n + 1, Z.shape[0] + n), dtype=np.float32)
     b = np.zeros(shape= (A.shape[0], 1), dtype=np.float32)
@@ -111,7 +111,10 @@ def recoverHdrRadianceMap(debevec_res: DebevecResults, channel, exposures):
         for j in range(hdrMap.shape[1]):
             hdrMap[i][j] = calc_pxHdr(i, j, channel, debevec_res.g, exposures)
     
-    return np.exp(hdrMap)
+    hdrMap = np.exp(hdrMap)
+    hdrMap = hdrMap / np.amax(hdrMap)
+    hdrMap = hdrMap * 255
+    return hdrMap
 
 def compute(imgs, exposures):
     b = np.zeros(shape= (imgs[0].shape[2], imgs[0].shape[0], imgs[0].shape[1]), dtype= np.uint8)
@@ -143,34 +146,37 @@ def compute(imgs, exposures):
         proc3 = executor.submit(recoverHdrRadianceMap, r_res, r, exposures)
 
     b_hdr = proc1.result()
+   
+    # b_hdr = np.exp(b_hdr)
+    # print(np.amax(b_hdr))
     g_hdr = proc2.result()
     r_hdr = proc3.result()
 
     hdr = cv.merge((b_hdr, g_hdr, r_hdr))
     
     
+    
     # hdr = ((hdr/np.amax(hdr))).astype(np.float32)
     # plt.imshow(cv.cvtColor(hdr, cv.COLOR_BGR2RGB))
     # plt.imsave("HDRFORSE.png", cv.cvtColor(hdr, cv.COLOR_BGR2RGB))
-    return hdr
     # plt.plot(range(255), b_res.g, 'ro')
     # plt.savefig("PLOT_norm.png")
-    # plt.plot(b_res.g, range(255))
+    plt.plot(b_res.g, range(256))
     
     # plt.axis([-5,5, 0 , 300])
-    # plt.savefig("PLOT_B.png")
+    plt.savefig("PLOT_B.png")
     
-    # plt.plot(g_res.g, range(255))
+    plt.plot(g_res.g, range(256))
     # plt.axis([-5,5, 0 , 300])
-    # plt.savefig("PLOT_G.png")
+    plt.savefig("PLOT_G.png")
     
-    # plt.plot(r_res.g, range(255))
+    plt.plot(r_res.g, range(256))
     # plt.axis([-5,5, 0 , 300])
-    # plt.savefig("PLOT_R.png")
+    plt.savefig("PLOT_R.png")
     
     # pprint(d)
     
     # return cv.merge((b, g, r))
-
+    return hdr
 
 
