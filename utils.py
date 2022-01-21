@@ -3,6 +3,7 @@ import numpy as np
 from PIL.ExifTags import TAGS
 from PIL.Image import Image
 from random import sample
+from tqdm import tqdm
 import pprint
 
 def get_exposure (img:Image) -> float:
@@ -48,5 +49,27 @@ def get_region_indexes(witdh, height, window):
    for i in range(0, witdh, window):
       for j in range(0, height, window):
          indexes.append(((i, i+window), (j, j + window)))
-   return indexes
+   return np.array(indexes)
 
+def get_region_centers(region_indexes):
+   centers = np.zeros(shape=(region_indexes.shape[0], 2), dtype= np.uint)
+   for i in range(centers.shape[0]):
+      centers[i][0] = (region_indexes[i][0][1] - region_indexes[i][0][0]) // 2 + region_indexes[i][0][0]
+      centers[i][1] = (region_indexes[i][1][1] - region_indexes[i][1][0]) // 2 + region_indexes[i][1][0]
+   return np.array(centers)
+
+def associate_index_to_centers(region_indexes, centers):
+   res = {}
+   for i in tqdm(range(region_indexes.shape[0])):
+      for x in range(region_indexes[i][0][0], region_indexes[i][0][1]):
+         for y in range(region_indexes[i][1][0], region_indexes[i][1][1]):
+            res[(x,y)] = centers[i]
+   return res
+
+# a = np.zeros(shape=(10,10))
+# i = get_region_indexes(10,10,5)
+# pprint.pprint(i)
+# c = get_region_centers(i)
+# pprint.pprint(c)
+# r = associate_index_to_centers(i, c)
+# pprint.pprint(r)
