@@ -75,7 +75,7 @@ def get_Laplacian_pyramid_image(img, pyr_levels):
 
     img_cp = img.copy()
     for i in range(0, pyr_levels - 1):
-        src = cv.GaussianBlur(img_cp, (3, 3), 0)
+        src = cv.GaussianBlur(img_cp, (3, 3), 0) # apply low pass filter
         img = cv.pyrDown(src)
         up_lv = cv.pyrUp(img)
         temp = cv.resize(up_lv, (img_cp.shape[:2][1], img_cp.shape[:2][0]))

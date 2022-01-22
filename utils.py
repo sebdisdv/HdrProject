@@ -27,7 +27,7 @@ def get_window(x, y, img, window_size):
    wx = [x - window_size if x - window_size > 0 else 0, x + window_size if x + window_size < img.shape[0] else img.shape[0] - 1]
    wy = [y - window_size if y - window_size > 0 else 0, y + window_size if y + window_size < img.shape[1] else img.shape[1] - 1]
 
-   return wx, wy
+   return np.array([wx, wy])
 
 
 def get_pixels_indexes(img_shape):
@@ -66,10 +66,3 @@ def associate_index_to_centers(region_indexes, centers):
             res[(x,y)] = centers[i]
    return res
 
-# a = np.zeros(shape=(10,10))
-# i = get_region_indexes(10,10,5)
-# pprint.pprint(i)
-# c = get_region_centers(i)
-# pprint.pprint(c)
-# r = associate_index_to_centers(i, c)
-# pprint.pprint(r)

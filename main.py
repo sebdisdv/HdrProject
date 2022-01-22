@@ -58,8 +58,11 @@ class HdrImplementations():
         # self.tonemap()
     
     def applyAceExhaustive(self, image_index):
+    
         self.result_img = exhaustive_ace.compute(self.images_paths[image_index])
-        # self.tonemap()
+        # self.tonemapAlgo = cv2.createTonemapReinhard()
+        # self.result_img = np.clip(self.tonemapAlgo.process(self.result_img.copy()) * 255, 0, 255).astype('uint8')
+        # self.__tonemap()
 
     def applyDebevec(self): #seba python
         self.result_merge = debevec.compute(self.images, self.exposure_times)
@@ -79,11 +82,12 @@ class HdrImplementations():
 def main():
 
     hdr = HdrImplementations(dataset_name="star")
+    # hdr.applyAceWindowed(1, 50)
     # hdr.applyGradient()
-    hdr.applyExpFusion()
+    # hdr.applyExpFusion()
     # hdr.applyDebevec()
     # hdr.__tonemap()
-    hdr.save_image("Exposure_fusion_results.jpg")
+    # hdr.save_image("ExpFusionUnderOver.jpg")
     # hdr.applyDebevec()
     
 
