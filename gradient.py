@@ -182,4 +182,4 @@ def compute(imgs, exposures):
     
 
     # print(res.shape)
-    # return res
+    return res

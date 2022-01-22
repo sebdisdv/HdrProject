@@ -9,6 +9,7 @@ import exhaustive_ace
 import windowed_ace
 import debevec
 import gradient
+import exposure_fusion
 from utils import get_exposure
 
 # create folder if it does not exists 
@@ -28,12 +29,12 @@ class HdrImplementations():
         
         # just to make things faster
         for i in range(len(self.images)):
-            self.images[i] = cv2.resize(self.images[i], (1000, 1000), interpolation= cv2.INTER_AREA)
+            self.images[i] = cv2.resize(self.images[i], (100, 100), interpolation= cv2.INTER_AREA)
 
         self.exposure_times = [get_exposure(Image.open(im)) for im in self.settings["dataset"][dataset_name]]
        
         #self.exposure_times = [get_exposure(Image.open(im)) for im in self.settings["dataset"][dataset_name]]
-        self.exposure_times = [0.0125, 0.125, 0.5]
+        # self.exposure_times = [0.0125, 0.125, 0.5]
         self.tonemapAlgo = cv2.createTonemapDrago(1.0, 0.7)
         self.result_merge = None
         self.result_img = None
@@ -46,7 +47,7 @@ class HdrImplementations():
         # self.result_img = np.clip(self.tonemapAlgo.process(self.result_merge.copy()) * 255, 0, 255).astype('uint8')
         self.result_img = self.tonemapAlgo.process(self.result_merge)
         self.result_img = 3 * self.result_img
-        self.result_img = self.result_img * 255 
+        self.result_img = self.result_img * 255
         self.result_img = np.clip(self.result_img, 0, 255).astype('uint8')
         
        
@@ -63,8 +64,10 @@ class HdrImplementations():
         self.result_merge = debevec.compute(self.images, self.exposure_times)
 
     def applyGradient(self):
-        self.result_merge = gradient.compute(self.images, self.exposure_times)
+        self.result_merge = np.float32(gradient.compute(self.images, self.exposure_times))
         
+    def applyExpFusion(self):
+        self.result_merge = exposure_fusion.compute(self.images, self.exposure_times)
 
     def save_image(self, name):
         if self.result_img is not None:
@@ -74,7 +77,7 @@ class HdrImplementations():
 def main():
 
     hdr = HdrImplementations(dataset_name="star")
-    hdr.applyGradient()
+    hdr.applyExpFusion()
     # hdr.applyDebevec()
     # hdr.tonemap()
     # hdr.save_image("AAAAA.jpg")
