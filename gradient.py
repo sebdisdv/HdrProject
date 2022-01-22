@@ -40,7 +40,7 @@ def deltaIy(img, channel, x, y):
 
 
 def getDetailsRegions(imgs):
-    region_indexes = get_region_indexes(imgs[0].shape[0], imgs[0].shape[1], 10)
+    region_indexes = get_region_indexes(imgs[0].shape[0], imgs[0].shape[1], 5)
     # region_indexes = np.array(region_indexes)
     M = []
     for i in range(len(imgs)):  # immagini
@@ -75,6 +75,7 @@ def joinBestRegions(imgs, M, region_indexes):
                     region_indexes[r_indx][1][0], region_indexes[r_indx][1][1]
                 ):
                     res[i][j][channel_indx] = imgs[index_image][i][j][channel_indx]
+    
     return res
 
 
@@ -159,18 +160,23 @@ def blend(img, regions_indexes):
     return cv.merge((b, g, r))
 
 
-def compute(imgs, exposures):
+def compute(imgs):
+    
+    for i in range(len(imgs)): # Values of intensity must be between 0 and 1
+        imgs[i] = imgs[i] / 255.0
+
     M, regions_indexes = getDetailsRegions(imgs)
     # pprint(list(regions_indexes))
     # print(regions_indexes.shape)
-    res = joinBestRegions(imgs, M, regions_indexes)
+    # res = joinBestRegions(imgs, M, regions_indexes)
+    # res = res / 255.0
     # pprint(res)
-    cv.imwrite("res_Middle_Gradient.jpg", res)
+    # cv.imwrite("res_Middle_Gradient.jpg", (res / np.amax(res)) * 255)
     # center_indexes = get_region_centers(regions_indexes)
     # pixel_region_center = associate_index_to_centers(regions_indexes, center_indexes)
     # pprint(pixel_region_center)
     # exit()
-    res = blend(res, regions_indexes)
+    res = blend(joinBestRegions(imgs, M, regions_indexes), regions_indexes)
     
     res = res / np.amax(res)
     res = 255 * res
