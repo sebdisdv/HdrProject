@@ -23,7 +23,7 @@ def deltaIx(img, channel, x, y):
 
     res = 0
     if x + 1 < img.shape[0] and y < img.shape[1]:
-        res = abs(int(img[x + 1][y][channel]) - int(img[x][y][channel]))
+        res = abs(img[x + 1][y][channel] - img[x][y][channel])
     else:
         res = 0
     return res
@@ -33,14 +33,14 @@ def deltaIx(img, channel, x, y):
 def deltaIy(img, channel, x, y):
     res = 0
     if y - 1 > 0 and x < img.shape[0]:
-        res = abs(int(img[x][y - 1][channel]) - int(img[x][y][channel]))
+        res = abs(img[x][y - 1][channel] - img[x][y][channel])
     else:
         res = 0
     return res
 
 
 def getDetailsRegions(imgs):
-    region_indexes = get_region_indexes(imgs[0].shape[0], imgs[0].shape[1], 5)
+    region_indexes = get_region_indexes(imgs[0].shape[0], imgs[0].shape[1], 2)
     # region_indexes = np.array(region_indexes)
     M = []
     for i in range(len(imgs)):  # immagini
@@ -75,20 +75,19 @@ def joinBestRegions(imgs, M, region_indexes):
                     region_indexes[r_indx][1][0], region_indexes[r_indx][1][1]
                 ):
                     res[i][j][channel_indx] = imgs[index_image][i][j][channel_indx]
-    
     return res
 
 
 @jit
 def U(x_c_reg, y_c_reg, x_c, y_c):
-    epsilon = 30
+    epsilon = 15
     return abs(int(x_c_reg) - int(x_c)) <= epsilon and abs(int(y_c_reg) - int(y_c)) <= epsilon
 
 
 @jit
 def exp_g(x, y, x_c, y_c) -> float:
-    sigma_x = 60
-    sigma_y = 60
+    sigma_x = 2
+    sigma_y = 2
     return exp(
         -((((int(x) - int(x_c)) ** 2) / (2 * sigma_x)) + (((int(y) - int(y_c)) ** 2) / (2 * sigma_y)))
     )
@@ -162,8 +161,11 @@ def blend(img, regions_indexes):
 
 def compute(imgs):
     
-    for i in range(len(imgs)): # Values of intensity must be between 0 and 1
-        imgs[i] = imgs[i] / 255.0
+    # for i in range(len(imgs)): # Values of intensity must be between 0 and 1
+    #     imgs[i] = imgs[i] / 255.0
+
+    for i in range(len(imgs)):
+        imgs[i] = np.float32(imgs[i])
 
     M, regions_indexes = getDetailsRegions(imgs)
     # pprint(list(regions_indexes))
@@ -183,8 +185,8 @@ def compute(imgs):
     # pprint(res)
     # pprint(res)
     # pprint(list(get_region_centers(regions_indexes)))
-    cv.imwrite("res__Final_Gradient.jpg", res)
-
+    # cv.imwrite("res__Final_Gradient_NOCAST.jpg", res)
+    # exit()
     
 
     # print(res.shape)
