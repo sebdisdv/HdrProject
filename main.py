@@ -10,7 +10,7 @@ import windowed_ace
 import debevec
 import gradient
 import exposure_fusion
-from utils import get_exposure
+from utils import create_folders, get_exposure
 
 from simple_term_menu import TerminalMenu
 
@@ -125,4 +125,5 @@ def main():
 
 
 if __name__ == "__main__":
+    create_folders()
     main()

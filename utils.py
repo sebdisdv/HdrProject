@@ -1,10 +1,11 @@
+import os
 import cv2 as cv
 import numpy as np
 from PIL.ExifTags import TAGS
 from PIL.Image import Image
 from random import sample
 from tqdm import tqdm
-
+from os import path
 
 def get_exposure(img: Image) -> float:
     """
@@ -78,3 +79,20 @@ def associate_index_to_centers(region_indexes, centers):
             for y in range(region_indexes[i][1][0], region_indexes[i][1][1]):
                 res[(x, y)] = np.array(centers[i])
     return res
+
+def create_folders():
+    if path.exists("Results"):
+        if not path.exists(path.join("Results", "Stella")):
+            os.mkdir(path.join("Results", "Stella"))
+        if not path.exists(path.join("Results", "Legno")):
+            os.mkdir(path.join("Results", "Legno"))
+        if not path.exists(path.join("Results", "Alberi")):
+            os.mkdir(path.join("Results", "Alberi"))
+        if not path.exists(path.join("Results", "Disco")):
+            os.mkdir(path.join("Results", "Disco"))
+    else:
+        os.mkdir("Results")
+        os.mkdir(path.join("Results", "Stella"))
+        os.mkdir(path.join("Results", "Legno"))
+        os.mkdir(path.join("Results", "Alberi"))
+        os.mkdir(path.join("Results", "Disco"))
