@@ -1,0 +1,5 @@
+black==20.8b1
+numba==0.55.0
+numpy==1.21.5
+opencv-python==4.5.5.62
+tqdm==4.61.1

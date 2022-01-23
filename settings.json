@@ -1,10 +1,25 @@
 {
   "save_path": "Results",
   "dataset": {
-    "star": [
-      "Dataset/stella/under.jpg",
-      "Dataset/stella/mid.jpg",
-      "Dataset/stella/over.jpg"
+    "Stella": [
+      "Dataset/Stella/under.jpg",
+      "Dataset/Stella/mid.jpg",
+      "Dataset/Stella/over.jpg"
+    ],
+    "Legno" : [
+      "Dataset/Legno/under.jpg",
+      "Dataset/Legno/mid.jpg",
+      "Dataset/Legno/over.jpg"
+    ],
+    "Disco" : [
+      "Dataset/Disco/under.jpg",
+      "Dataset/Disco/mid.jpg",
+      "Dataset/Disco/over.jpg"
+    ], 
+    "Alberi" : [
+      "Dataset/Alberi/under.jpg",
+      "Dataset/Alberi/mid.jpg",
+      "Dataset/Alberi/over.jpg"
     ]
   }
 }
