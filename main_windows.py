@@ -51,7 +51,7 @@ def select_quit():
     quit.show()
     quit.exit()
 
-    return quit.selected_option - 1 
+    return quit.selected_option 
 
 class HdrImplementations():
 
