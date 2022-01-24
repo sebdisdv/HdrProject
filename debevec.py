@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 import concurrent.futures
-import matplotlib.pyplot as plt
+
 
 from numba import jit
 from tqdm import tqdm
