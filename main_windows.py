@@ -10,68 +10,78 @@ import windowed_ace
 import debevec
 import gradient
 import exposure_fusion
-from utils import create_folders, get_exposure
+from utils import get_exposure, create_folders
 
-from simple_term_menu import TerminalMenu
+from consolemenu import SelectionMenu
 from termcolor import colored
 
 DATASETS = ["Legno", "Stella", "Alberi", "Disco"]
 IMGLIST = ["Under", "Mid", "Over"]
 ALGORITHMS = ["ACE", "ACE_Windowed", "Debevec", "Mertens"]
-QUIT = ["No", "Yes"]
-
 
 def select_algorithm():
-    menu = TerminalMenu(
-        ALGORITHMS, clear_screen=True, title="\nSelect which algorithm to use\n"
-    )
-    return ALGORITHMS[menu.show()]
+    algorithm_selection = SelectionMenu(ALGORITHMS, "Select which algorithm to use", show_exit_option=False, clear_screen=True)
 
+    algorithm_selection.show()
+
+    algorithm_selection.join()
+
+    return algorithm_selection.selected_option
 
 def select_dataset():
-    menu = TerminalMenu(DATASETS, title="\nSelect which Dataset to use\n")
-    return DATASETS[menu.show()]
+    dataset_selection = SelectionMenu(DATASETS, "Select which dataset to use", show_exit_option=False, clear_screen=False)
 
+    dataset_selection.show()
+
+    dataset_selection.join()
+
+    return dataset_selection.selected_option
 
 def select_image():
-    menu = TerminalMenu(IMGLIST, title="\nSelect which image to use\n")
-    return menu.show()
+    img_selection = SelectionMenu(IMGLIST, "Select which image to use", show_exit_option=False, clear_screen=False)
 
+    img_selection.show()
+
+    img_selection.join()
+
+    return img_selection.selected_option
 
 def select_quit():
-    menu = TerminalMenu(QUIT, title="\nDo you want to quit?\n")
-    return QUIT[menu.show()]
+    quit = SelectionMenu(["No", "Yes"], "Do you want to quit?", show_exit_option=False, clear_screen=False)
+    quit.show()
+    quit.exit()
 
+    return quit.selected_option - 1 
 
-class HdrImplementations:
+class HdrImplementations():
+
     def __init__(self, dataset_name: str) -> None:
         self.dataset_name = dataset_name
+
         self.settings = json.load(open("settings.json"))
         self.images_paths = self.settings["dataset"][dataset_name]
         self.images = [cv2.imread(im) for im in self.settings["dataset"][dataset_name]]
 
-        self.exposure_times = [
-            get_exposure(Image.open(im))
-            for im in self.settings["dataset"][dataset_name]
-        ]
-
-        # self.exposure_times = [0.0125, 0.125, 0.5]
-
+        self.exposure_times = [get_exposure(Image.open(im)) for im in self.settings["dataset"][dataset_name]]
+       
+        #self.exposure_times = [0.0125, 0.125, 0.5]
         self.tonemapAlgo = cv2.createTonemapDrago(1.0, 0.7)
         self.result_merge = None
         self.result_img = None
 
-    def applyDebevecArt(self):
+    def applyDebevecArt(self): 
         merge = cv2.createMergeDebevec()
-        self.result_merge = merge.process(self.images, times=self.exposure_times.copy())
-
+        self.result_merge = merge.process(self.images, times= self.exposure_times.copy())
+               
     def applyAceWindowed(self, image_index, window):
         self.result_img = windowed_ace.compute(self.images_paths[image_index], window)
-
+        
+    
     def applyAceExhaustive(self, image_index):
         self.result_img = exhaustive_ace.compute(self.images_paths[image_index])
+        
 
-    def applyDebevec(self):
+    def applyDebevec(self): 
         self.result_merge = debevec.compute(self.images, self.exposure_times)
         self.result_img = self.tonemapAlgo.process(self.result_merge.copy())
         if self.dataset_name == "Stella":
@@ -81,49 +91,48 @@ class HdrImplementations:
 
     def applyGradient(self):
         self.result_img = gradient.compute(self.images)
-
+        
     def applyExpFusion(self):
         self.result_img = exposure_fusion.compute(self.images)
 
     def save_image(self, name):
         if self.result_img is not None:
-            cv2.imwrite(
-                path.join(self.settings["save_path"], self.dataset_name, f"{name}.jpg"),
-                self.result_img,
-            )
+            cv2.imwrite(path.join(self.settings["save_path"], self.dataset_name, f"{name}.jpg"), self.result_img)
+
+
+
 
 
 def main():
     while True:
-        algorithm = select_algorithm()
-        dataset = select_dataset()
-        img = -1
-        if algorithm in ["ACE", "ACE_Windowed"]:
+        algo_index = select_algorithm()
+        dataset_index = select_dataset()
+        img_index = -1
+        if algo_index <= 1:
             img_index = select_image()
 
-        hdr = HdrImplementations(dataset_name=dataset)
-        print(f"Algorithm selected {algorithm}")
-        print(f"Dataset selected {dataset}")
+        hdr = HdrImplementations(dataset_name= DATASETS[dataset_index])
+        print(f"Algorithm selected {ALGORITHMS[algo_index]}")
+        print(f"Dataset selected {DATASETS[dataset_index]}")
         name_res = input("Insert name for the resulting image: ")
 
-        if algorithm == "ACE":
+        if ALGORITHMS[algo_index] == "ACE":
             hdr.applyAceExhaustive(img_index)
-        elif algorithm == "ACE_Windowed":
+        elif ALGORITHMS[algo_index] == "ACE_Windowed":
             window = int(input("Insert window size in the range 100 <= w <= 250: "))
             window = np.clip(window, 100, 250)
             hdr.applyAceWindowed(img_index, window)
-        elif algorithm == "Debevec":
+        elif ALGORITHMS[algo_index] == "Debevec":
             hdr.applyDebevec()
-        elif algorithm == "Mertens":
+        elif ALGORITHMS[algo_index] == "Mertens":
             hdr.applyExpFusion()
 
         hdr.save_image(name_res)
 
-        print(colored(f"Image has benn saved in Results/{dataset}", 'green'))
+        print(colored(f"\nImage has been saved in Results/{DATASETS[dataset_index]}", 'green'))
 
-        if select_quit() == "Yes":
+        if select_quit():
             exit()
-
 
 if __name__ == "__main__":
     create_folders()

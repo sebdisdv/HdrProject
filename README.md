@@ -7,5 +7,5 @@
 
 ## Run the project
 
-- Windows `py main.py`
+- Windows `py main_windows.py`
 - Unix/MacOs `python3 main.py`
