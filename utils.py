@@ -14,7 +14,10 @@ def get_exposure(img: Image) -> float:
     exif = img._getexif()
     for (k, v) in exif.items():
         if TAGS.get(k) == "ExposureTime":
-            return v[0] / v[1]
+            if isinstance(v, tuple):
+                return v[0] / v[1] 
+            else:
+                return v
 
 
 def split_channels(img: Image):
