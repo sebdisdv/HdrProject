@@ -80,7 +80,7 @@ def debevec(channel, exposures):
 
 
 @jit
-def calc_pxHdr(i, j, channel, g, exposures):
+def calc_pxHdr(i, j, channel, g, exposures) -> float:
     num = 0
     den = 0
     for k in range(len(channel)):
@@ -90,7 +90,7 @@ def calc_pxHdr(i, j, channel, g, exposures):
 
 
 def recoverHdrRadianceMap(debevec_res: DebevecResults, channel, exposures):
-    exposures = np.array(exposures)
+    exposures = np.array(exposures, dtype= np.float32)
     hdrMap = np.zeros(shape=(channel.shape[1], channel.shape[2]), dtype=np.float32)
     for i in tqdm(range(hdrMap.shape[0])):
         for j in range(hdrMap.shape[1]):
