@@ -28,12 +28,11 @@ def w(z):
 def compute_Z(channel):
     Z_indexes = get_pixels_indexes((channel.shape[1], channel.shape[2]))
     # 500 is the number of pixel necessary
-    Z = np.zeros(shape=(500, 3), dtype=np.uint8)
+    Z = np.zeros(shape=(500, channel.shape[0]), dtype=np.uint8)
     k = 0
     for (i, j) in Z_indexes:
-        Z[k][0] = channel[0][i][j]
-        Z[k][1] = channel[1][i][j]
-        Z[k][2] = channel[2][i][j]
+        for ii in range(channel.shape[0]):
+            Z[k][ii] = channel[ii][i][j]
         k += 1
     return Z
 
@@ -104,13 +103,14 @@ def recoverHdrRadianceMap(debevec_res: DebevecResults, channel, exposures):
 
 def compute(imgs, exposures):
     b = np.zeros(
-        shape=(imgs[0].shape[2], imgs[0].shape[0], imgs[0].shape[1]), dtype=np.uint8
+        shape=(len(imgs), imgs[0].shape[0], imgs[0].shape[1]), dtype=np.uint8
     )
+    
     g = np.zeros(
-        shape=(imgs[0].shape[2], imgs[0].shape[0], imgs[0].shape[1]), dtype=np.uint8
+        shape=(len(imgs), imgs[0].shape[0], imgs[0].shape[1]), dtype=np.uint8
     )
     r = np.zeros(
-        shape=(imgs[0].shape[2], imgs[0].shape[0], imgs[0].shape[1]), dtype=np.uint8
+        shape=(len(imgs), imgs[0].shape[0], imgs[0].shape[1]), dtype=np.uint8
     )
     i = 0
     for img in imgs:
@@ -139,5 +139,7 @@ def compute(imgs, exposures):
     r_hdr = proc3.result()
 
     hdr = cv.merge((b_hdr, g_hdr, r_hdr))
+
+   
 
     return hdr
