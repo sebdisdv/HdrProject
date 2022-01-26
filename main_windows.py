@@ -18,7 +18,7 @@ from typing import List
 
 
 
-IMGLIST = ["Under", "Mid", "Over"]
+
 ALGORITHMS = ["ACE", "ACE_Windowed", "Debevec", "Mertens"]
 
 def select_algorithm():
@@ -141,4 +141,5 @@ def main(names, info):
 
 if __name__ == "__main__":
     names, info = get_dataset_info()
+    create_folders(names)
     main(names, info)

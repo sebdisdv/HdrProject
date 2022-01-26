@@ -94,9 +94,10 @@ def get_dataset_info() -> tuple:
 def create_folders(names) -> None:
     if path.exists("Results"):
         for name in names:
-            if not path.exists(path.join("Resutls", name)):
+            if not path.exists(path.join("Results", name)):
                 os.mkdir(path.join("Results", name))
     else:
         os.mkdir("Results")
         for name in names:
-            os.mkdir(path.join("Results", name))   
+            if not path.exists(path.join("Results", name)):
+                os.mkdir(path.join("Results", name))

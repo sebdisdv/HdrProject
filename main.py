@@ -10,13 +10,11 @@ import windowed_ace
 import debevec
 import gradient
 import exposure_fusion
-from utils import create_folders, get_exposure
+from utils import create_folders, get_exposure, get_dataset_info
 
 from simple_term_menu import TerminalMenu
 from termcolor import colored
 
-DATASETS = ["Legno", "Stella", "Alberi", "Disco"]
-IMGLIST = ["Under", "Mid", "Over"]
 ALGORITHMS = ["ACE", "ACE_Windowed", "Debevec", "Mertens"]
 QUIT = ["No", "Yes"]
 
@@ -28,13 +26,13 @@ def select_algorithm():
     return ALGORITHMS[menu.show()]
 
 
-def select_dataset():
-    menu = TerminalMenu(DATASETS, title="\nSelect which Dataset to use\n")
-    return DATASETS[menu.show()]
+def select_dataset(names):
+    menu = TerminalMenu(names, title="\nSelect which Dataset to use\n")
+    return names[menu.show()]
 
 
-def select_image():
-    menu = TerminalMenu(IMGLIST, title="\nSelect which image to use\n")
+def select_image(imgs_names):
+    menu = TerminalMenu(imgs_names, title="\nSelect which image to use\n")
     return menu.show()
 
 
@@ -44,15 +42,15 @@ def select_quit():
 
 
 class HdrImplementations:
-    def __init__(self, dataset_name: str) -> None:
+    def __init__(self, dataset_name: str, imgs_names) -> None:
         self.dataset_name = dataset_name
-        self.settings = json.load(open("settings.json"))
-        self.images_paths = self.settings["dataset"][dataset_name]
-        self.images = [cv2.imread(im) for im in self.settings["dataset"][dataset_name]]
+        # self.settings = json.load(open("settings.json"))
+        self.images_paths = [path.join("Dataset", dataset_name, img) for img in imgs_names]
+        self.images = [cv2.imread(im) for im in self.images_paths]
 
         self.exposure_times = [
             get_exposure(Image.open(im))
-            for im in self.settings["dataset"][dataset_name]
+            for im in self.images_paths
         ]
 
         # self.exposure_times = [0.0125, 0.125, 0.5]
@@ -88,20 +86,20 @@ class HdrImplementations:
     def save_image(self, name):
         if self.result_img is not None:
             cv2.imwrite(
-                path.join(self.settings["save_path"], self.dataset_name, f"{name}.jpg"),
+                path.join("Results", self.dataset_name, f"{name}.jpg"),
                 self.result_img,
             )
 
 
-def main():
+def main(names, info):
     while True:
         algorithm = select_algorithm()
-        dataset = select_dataset()
-        img = -1
+        dataset = select_dataset(names)
+        img_index = -1
         if algorithm in ["ACE", "ACE_Windowed"]:
-            img_index = select_image()
+            img_index = select_image(info[dataset])
 
-        hdr = HdrImplementations(dataset_name=dataset)
+        hdr = HdrImplementations(dataset_name=dataset, imgs_names= info[dataset])
         print(f"Algorithm selected {algorithm}")
         print(f"Dataset selected {dataset}")
         name_res = input("Insert name for the resulting image: ")
@@ -126,5 +124,6 @@ def main():
 
 
 if __name__ == "__main__":
-    create_folders()
-    main()
+    names, info = get_dataset_info()
+    create_folders(names)
+    main(names, info)
