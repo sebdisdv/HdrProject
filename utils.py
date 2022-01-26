@@ -83,19 +83,20 @@ def associate_index_to_centers(region_indexes, centers):
                 res[(x, y)] = np.array(centers[i])
     return res
 
-def create_folders():
+def get_dataset_info() -> tuple:
+    names = os.listdir("./Dataset")
+    info = {}
+    for name in names:
+        for _, _, imgs_path in os.walk(path.join("Dataset", name)):
+            info[name] = imgs_path
+    return names, info
+
+def create_folders(names) -> None:
     if path.exists("Results"):
-        if not path.exists(path.join("Results", "Stella")):
-            os.mkdir(path.join("Results", "Stella"))
-        if not path.exists(path.join("Results", "Legno")):
-            os.mkdir(path.join("Results", "Legno"))
-        if not path.exists(path.join("Results", "Alberi")):
-            os.mkdir(path.join("Results", "Alberi"))
-        if not path.exists(path.join("Results", "Disco")):
-            os.mkdir(path.join("Results", "Disco"))
+        for name in names:
+            if not path.exists(path.join("Resutls", name)):
+                os.mkdir(path.join("Results", name))
     else:
         os.mkdir("Results")
-        os.mkdir(path.join("Results", "Stella"))
-        os.mkdir(path.join("Results", "Legno"))
-        os.mkdir(path.join("Results", "Alberi"))
-        os.mkdir(path.join("Results", "Disco"))
+        for name in names:
+            os.mkdir(path.join("Results", name))   

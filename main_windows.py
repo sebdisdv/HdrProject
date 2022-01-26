@@ -10,12 +10,14 @@ import windowed_ace
 import debevec
 import gradient
 import exposure_fusion
-from utils import get_exposure, create_folders
+from utils import get_exposure, get_dataset_info, create_folders
 
 from consolemenu import SelectionMenu
 from termcolor import colored
+from typing import List
 
-DATASETS = ["Legno", "Stella", "Alberi", "Disco"]
+
+
 IMGLIST = ["Under", "Mid", "Over"]
 ALGORITHMS = ["ACE", "ACE_Windowed", "Debevec", "Mertens"]
 
@@ -28,8 +30,8 @@ def select_algorithm():
 
     return algorithm_selection.selected_option
 
-def select_dataset():
-    dataset_selection = SelectionMenu(DATASETS, "Select which dataset to use", show_exit_option=False, clear_screen=False)
+def select_dataset(names):
+    dataset_selection = SelectionMenu(names, "Select which dataset to use", show_exit_option=False, clear_screen=False)
 
     dataset_selection.show()
 
@@ -37,8 +39,8 @@ def select_dataset():
 
     return dataset_selection.selected_option
 
-def select_image():
-    img_selection = SelectionMenu(IMGLIST, "Select which image to use", show_exit_option=False, clear_screen=False)
+def select_image(names):
+    img_selection = SelectionMenu(names, "Select which image to use", show_exit_option=False, clear_screen=False)
 
     img_selection.show()
 
@@ -55,14 +57,15 @@ def select_quit():
 
 class HdrImplementations():
 
-    def __init__(self, dataset_name: str) -> None:
+    def __init__(self, dataset_name: str, imgs_names: List[str]) -> None:
         self.dataset_name = dataset_name
 
-        self.settings = json.load(open("settings.json"))
-        self.images_paths = self.settings["dataset"][dataset_name]
-        self.images = [cv2.imread(im) for im in self.settings["dataset"][dataset_name]]
-
-        self.exposure_times = [get_exposure(Image.open(im)) for im in self.settings["dataset"][dataset_name]]
+        # self.settings = json.load(open("settings.json"))
+        self.images_paths = [path.join("Dataset", dataset_name, img) for img in imgs_names]
+        
+        self.images = [cv2.imread(im) for im in self.images_paths]
+        
+        self.exposure_times = [get_exposure(Image.open(im)) for im in self.images_paths]
        
         #self.exposure_times = [0.0125, 0.125, 0.5]
         self.tonemapAlgo = cv2.createTonemapDrago(1.0, 0.7)
@@ -97,23 +100,25 @@ class HdrImplementations():
 
     def save_image(self, name):
         if self.result_img is not None:
-            cv2.imwrite(path.join(self.settings["save_path"], self.dataset_name, f"{name}.jpg"), self.result_img)
+            cv2.imwrite(path.join("Results", self.dataset_name, f"{name}.jpg"), self.result_img)
 
 
 
 
 
-def main():
+def main(names, info):
     while True:
-        algo_index = select_algorithm()
-        dataset_index = select_dataset()
-        img_index = -1
-        if algo_index <= 1:
-            img_index = select_image()
 
-        hdr = HdrImplementations(dataset_name= DATASETS[dataset_index])
+        algo_index = select_algorithm()
+        dataset_index = select_dataset(names)
+        img_index = -1
+        
+        if algo_index <= 1:
+            img_index = select_image(info[names[dataset_index]])
+
+        hdr = HdrImplementations(dataset_name= names[dataset_index], imgs_names= info[names[dataset_index]])
         print(f"Algorithm selected {ALGORITHMS[algo_index]}")
-        print(f"Dataset selected {DATASETS[dataset_index]}")
+        print(f"Dataset selected {names[dataset_index]}")
         name_res = input("Insert name for the resulting image: ")
 
         if ALGORITHMS[algo_index] == "ACE":
@@ -129,11 +134,11 @@ def main():
 
         hdr.save_image(name_res)
 
-        print(colored(f"\nImage has been saved in Results/{DATASETS[dataset_index]}", 'green'))
+        print(colored(f"\nImage has been saved in Results/{names[dataset_index]}", 'green'))
 
         if select_quit():
             exit()
 
 if __name__ == "__main__":
-    create_folders()
-    main()
+    names, info = get_dataset_info()
+    main(names, info)
