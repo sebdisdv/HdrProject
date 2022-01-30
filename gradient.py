@@ -60,20 +60,17 @@ def getDetailsRegions(imgs):
 
 def joinBestRegions(imgs, M, region_indexes):
     res = np.zeros(imgs[0].shape)
-    l = [0, 0, 0]
     for channel_indx in range(3):
         for r_indx in tqdm(range(M.shape[1])):  # iterate over each region
             max_r = {}
             for i in range(len(imgs)):
                 max_r[np.sum(M[i][r_indx])] = i
             index_image = max_r[max(max_r)]
-            l[index_image] += 1
             for i in range(region_indexes[r_indx][0][0], region_indexes[r_indx][0][1]):
                 for j in range(
                     region_indexes[r_indx][1][0], region_indexes[r_indx][1][1]
                 ):
                     res[i][j][channel_indx] = imgs[index_image][i][j][channel_indx]
-    print(l)
     return res
 
 
