@@ -10,4 +10,5 @@
 - Windows `py main_windows.py`
 - Unix/MacOs `python3 main.py`
 
-##
+## Important
+- Do not delete the "Dataset" folder
