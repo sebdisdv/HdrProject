@@ -30,7 +30,7 @@ def get_saturation_weights(imgs, N):
 
 
 def get_well_exposedness_weights(imgs, N):
-    sigma = 0.5 ** 2  # value used in the paper
+    sigma = 0.5**2  # value used in the paper
     E_weights = np.zeros((N, imgs[0].shape[0], imgs[0].shape[1]), dtype=np.float32)
     for i in range(N):
         b, g, r = cv.split(
@@ -64,7 +64,7 @@ def get_weights_map(imgs):
 def get_Gaussian_pyramid_weight_map(w, pyr_levels):
     w_copy = w.copy()
     pyrWeights = [w_copy]
-    for i in range(1, pyr_levels):
+    for _ in range(1, pyr_levels):
         w_copy = cv.pyrDown(cv.GaussianBlur(w_copy, (3, 3), 0))
         pyrWeights.append(w_copy)
     return pyrWeights
@@ -74,8 +74,8 @@ def get_Laplacian_pyramid_image(img, pyr_levels):
     pyrLaplacian = []
 
     img_cp = img.copy()
-    for i in range(0, pyr_levels - 1):
-        src = cv.GaussianBlur(img_cp, (3, 3), 0) # apply low pass filter
+    for _ in range(0, pyr_levels - 1):
+        src = cv.GaussianBlur(img_cp, (3, 3), 0)  # apply low pass filter
         img = cv.pyrDown(src)
         up_lv = cv.pyrUp(img)
         temp = cv.resize(up_lv, (img_cp.shape[:2][1], img_cp.shape[:2][0]))
@@ -119,7 +119,7 @@ def compute(imgs):
 
     level_pyr = 12
 
-    for i in range(len(imgs)):  # Values of intensity must be in the range [0...255]
+    for i in range(len(imgs)):  # Values of intensity must be in the range [0...1]
         imgs[i] = np.float32(imgs[i]) / 255.0
 
     W = get_weights_map(imgs)

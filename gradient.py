@@ -161,9 +161,6 @@ def blend(img, regions_indexes):
 
 def compute(imgs):
 
-    # for i in range(len(imgs)):
-    #     imgs[i] = imgs[i] / 255.0
-
     for i in range(len(imgs)):
         imgs[i] = np.float32(imgs[i])
 

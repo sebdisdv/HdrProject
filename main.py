@@ -1,17 +1,14 @@
-import json
-import os.path as path
-
-import cv2
-import numpy as np
-from PIL import Image
-
 import exhaustive_ace
 import windowed_ace
 import debevec
 import gradient
 import exposure_fusion
-from utils import create_folders, get_exposure, get_dataset_info
+import cv2
+import numpy as np
+import os.path as path
 
+from PIL import Image
+from utils import create_folders, get_exposure, get_dataset_info
 from simple_term_menu import TerminalMenu
 from termcolor import colored
 
@@ -44,16 +41,12 @@ def select_quit():
 class HdrImplementations:
     def __init__(self, dataset_name: str, imgs_names) -> None:
         self.dataset_name = dataset_name
-        # self.settings = json.load(open("settings.json"))
-        self.images_paths = [path.join("Dataset", dataset_name, img) for img in imgs_names]
+        self.images_paths = [
+            path.join("Dataset", dataset_name, img) for img in imgs_names
+        ]
         self.images = [cv2.imread(im) for im in self.images_paths]
 
-        self.exposure_times = [
-            get_exposure(Image.open(im))
-            for im in self.images_paths
-        ]
-
-        # self.exposure_times = [0.0125, 0.125, 0.5]
+        self.exposure_times = [get_exposure(Image.open(im)) for im in self.images_paths]
 
         self.tonemapAlgo = cv2.createTonemapDrago(1.0, 0.7)
         self.result_merge = None
@@ -99,7 +92,7 @@ def main(names, info):
         if algorithm in ["ACE", "ACE_Windowed"]:
             img_index = select_image(info[dataset])
 
-        hdr = HdrImplementations(dataset_name=dataset, imgs_names= info[dataset])
+        hdr = HdrImplementations(dataset_name=dataset, imgs_names=info[dataset])
         print(f"Algorithm selected {algorithm}")
         print(f"Dataset selected {dataset}")
         name_res = input("Insert name for the resulting image: ")
@@ -117,7 +110,7 @@ def main(names, info):
 
         hdr.save_image(name_res)
 
-        print(colored(f"Image has benn saved in Results/{dataset}", 'green'))
+        print(colored(f"Image has benn saved in Results/{dataset}", "green"))
 
         if select_quit() == "Yes":
             exit()

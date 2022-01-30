@@ -1,12 +1,11 @@
 import concurrent.futures
-from math import ceil
-
 import cv2 as cv
 import numpy as np
+
+from math import ceil
 from numba import jit
 from PIL import Image
 from tqdm import tqdm
-
 from utils import split_channels
 
 
@@ -38,7 +37,6 @@ def imVal(x, y, img):
     norm_factor = 0.0
     for xi in range(img.shape[0]):
         for yi in range(img.shape[1]):
-            # if x != xi or y != yi:
             pix_dif = r(img[x][y] - img[xi][yi])
             dist = distance(x, y, xi, yi)
             if dist != 0:

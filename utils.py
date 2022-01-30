@@ -7,15 +7,16 @@ from random import sample
 from tqdm import tqdm
 from os import path
 
+
 def get_exposure(img: Image) -> float:
     """
-    This is a multiline comment
+    Read exposure from metadata of the images file
     """
     exif = img._getexif()
     for (k, v) in exif.items():
         if TAGS.get(k) == "ExposureTime":
             if isinstance(v, tuple):
-                return v[0] / v[1] 
+                return v[0] / v[1]
             else:
                 return v
 
@@ -54,7 +55,7 @@ def get_pixels_indexes(img_shape):
     return Z_indexes
 
 
-# onlywork if width and height can be divided by window
+# Only works if width and height can be divided by window
 def get_region_indexes(witdh, height, window):
     indexes = []
     for i in range(0, witdh, window):
@@ -77,11 +78,12 @@ def get_region_centers(region_indexes):
 
 def associate_index_to_centers(region_indexes, centers):
     res = {}
-    for i in tqdm(range(region_indexes.shape[0])):
+    for i in range(region_indexes.shape[0]):
         for x in range(region_indexes[i][0][0], region_indexes[i][0][1]):
             for y in range(region_indexes[i][1][0], region_indexes[i][1][1]):
                 res[(x, y)] = np.array(centers[i])
     return res
+
 
 def get_dataset_info() -> tuple:
     names = os.listdir("./Dataset")
@@ -90,6 +92,7 @@ def get_dataset_info() -> tuple:
         for _, _, imgs_path in os.walk(path.join("Dataset", name)):
             info[name] = imgs_path
     return names, info
+
 
 def create_folders(names) -> None:
     if path.exists("Results"):
