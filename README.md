@@ -11,5 +11,5 @@
 - Unix/MacOs `python3 main.py`
 
 ## Note Dataset
-- To add new dataset, adds folders
+- To add new dataset, adds folders in the Dataset directory
 - Do not delete the "Dataset" folder
